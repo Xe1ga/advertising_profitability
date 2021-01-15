@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  db_mysql:
+    image: mysql:5.6
+    container_name: db_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+     - ./data:/var/lib/mysql
+     - ./tz2.sql:/docker-entrypoint-initdb.d/tz2.sql
+    restart: always
+    ports:
+     - "3306:3306"
+    environment:
+     - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+     - MYSQL_DATABASE=${DB_NAME}
+     - MYSQL_USER=${DB_USER}
+     - MYSQL_PASSWORD=${DB_PASSWORD}
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+     - PMA_ARBITRARY=1
+    restart: always
+    depends_on:
+     - db_mysql
+    ports:
+     - "8080:80"
+    volumes:
+     - /sessions
+     - ~/docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+     - /custom/phpmyadmin/theme/:/www/themes/theme/
+
