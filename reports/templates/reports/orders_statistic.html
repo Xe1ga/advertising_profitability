@@ -5,8 +5,9 @@
     <title>Title</title>
 </head>
 <body>
-{{orders_statistic_count}}
-{{clicks_statistic_count}}
+{% for s in statistic %}
+<div>{{s.date}} {{s.clicks}} {{s.orders_in_processed}} {{s.orders_approved}} {{s.orders_canceled}} {{s.orders_affiliate_fee}}</div>>
+{% endfor %}
 
 
 </body>
