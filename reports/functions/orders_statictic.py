@@ -116,15 +116,18 @@ def get_orders_statistic(begin_date: date, end_date: date):
     clicks_statistic = get_clicks_statistic(begin_date, end_date)
     dates = list(clicks_statistic.keys())
     dates.sort()
-    result = map(lambda created_date: OrdersStatistic(
-        date=created_date,
-        clicks=clicks_statistic.get(created_date),
-        orders_in_processing=get_ordered_for_status(begin_date, end_date, 'in processing').get(created_date),
-        orders_approved=get_ordered_for_status(begin_date, end_date, 'approved').get(created_date),
-        orders_canceled=get_ordered_for_status(begin_date, end_date, 'canceled').get(created_date),
-        orders_affiliate_fee=get_orders_affiliate_fee(begin_date, end_date).get(created_date)
-    ),
-                 dates)
+
+    result = [OrdersStatistic(date=created_date,
+                              clicks=clicks_statistic.get(created_date),
+                              orders_in_processing=get_ordered_for_status(begin_date, end_date, 'in processing').get(
+                                  created_date),
+                              orders_approved=get_ordered_for_status(begin_date, end_date, 'approved').get(
+                                  created_date),
+                              orders_canceled=get_ordered_for_status(begin_date, end_date, 'canceled').get(
+                                  created_date),
+                              orders_affiliate_fee=get_orders_affiliate_fee(begin_date, end_date).get(created_date)
+                              )
+              for created_date in dates]
     for r in result:
         print(r.date, r.clicks, r.orders_in_processing, r.orders_approved, r.orders_canceled, r.orders_affiliate_fee)
     return result

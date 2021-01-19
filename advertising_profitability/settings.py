@@ -9,16 +9,15 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-from envparse import env
 
 import os
 
-from pathlib import Path
+from envparse import env
 
 env.read_envfile()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -42,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'compressor',
     'reports',
 ]
 
@@ -118,7 +118,7 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 # LANGUAGE_CODE = 'ru-RU'
-
+#
 # TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
@@ -132,3 +132,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders..
+    'compressor.finders.CompressorFinder',
+)

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+{% load static compress %}
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Статистика доходности</title>
+        {% block stylesheets %}
+        {% compress css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'contacts/css/bootstrap.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'contacts/css/style.css' %}" />
+        {% endcompress %}
+
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+
+        {% endblock %}
+    </head>
+    <body>
+
+        {% block form %}
+        {% endblock form %}
+        {% block content %}
+        {% endblock %}
+
+        <footer class="footer">
+            <br/>
+            <br/>
+        </footer>
+
+        {% block javascripts %}
+        {% compress js %}
+        <script type="text/javascript" src="{% static 'reports/js/bootstrap.js' %}"></script>
+        {% endcompress %}
+        {% endblock %}
+    </body>
+
+</html>

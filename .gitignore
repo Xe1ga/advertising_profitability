@@ -132,3 +132,4 @@ dmypy.json
 data/
 tz2.sql
 tz2.txt
+static/
