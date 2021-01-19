@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from datetime import date
-from typing import Any
-
-from django.db.models.query import QuerySet
+from typing import Any, Optional
 
 
 def get_str_from_date(value: date) -> str:
@@ -37,3 +35,12 @@ def get_dict(function_to_decorate):
         return result
 
     return wrap
+
+
+def exclude_none(value: Optional[str]) -> str:
+    """
+    Возвращает строку с 0 вместо None, если Values None
+    :param value:
+    :return:
+    """
+    return value if value else "0"
