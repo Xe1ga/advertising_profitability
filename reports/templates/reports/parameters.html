@@ -1,0 +1,80 @@
+{% extends "reports/base.html" %}
+{% load static %}
+{% load compress %}
+
+
+{% block stylesheets %}
+{{ block.super }}
+{% compress css %}
+<link rel="stylesheet" type="text/css" href="{% static 'reports/css/table.css' %}"/>
+{% endcompress %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+	  <div class="col-xs-12">
+        <h3 class="page-header">Введите параметры отчета</h3>
+      </div>
+    </div>
+</div>
+<div class="container">
+<div class="row">
+  <div class="col-xs-12">
+      <form class="form-horizontal" action="{% url 'reports:get_report' %}" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <h4>Начальная дата отчета</h4>
+            <div class="input-group date" name=""begiid="begin_date">
+              <input type="text" class="form-control" />
+              <span class="input-group-addon">
+                <span class="glyphicon-calendar glyphicon"></span>
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <h4>Конечная дата отчета</h4>
+            <div class="input-group date" id="end_date">
+              <input type="text" class="form-control" />
+              <span class="input-group-addon">
+                <span class="glyphicon-calendar glyphicon"></span>
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+              <button type="submit" class="btn btn-default">Формировать</button>
+          </div>
+      </form>
+  </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="{% static 'reports/js/jquery-3.2.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'reports/js/moment-with-locales.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'reports/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'reports/js/bootstrap-datetimepicker.min.js' %}"></script>
+    {{ block.super }}
+    {% compress js %}
+    <script type="text/javascript">
+    $(function () {
+      $('#begin_date').datetimepicker({
+	    locale: 'ru',
+		stepping:10,
+		format: 'DD.MM.YYYY',
+		daysOfWeekDisabled:[0,6]
+	  });
+      $('#end_date').datetimepicker({
+	    locale: 'ru',
+		stepping:10,
+		format: 'DD.MM.YYYY',
+		daysOfWeekDisabled:[0,6]
+	  });
+    });
+    </script>
+    {% endcompress %}
+{% endblock %}
+
