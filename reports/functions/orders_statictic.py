@@ -64,7 +64,7 @@ def get_orders_affiliate_fee(begin_date: date, end_date: date) -> dict:
                                                  created_at__lte=timezone.make_aware(end_date)). \
         annotate(date=TruncDate('created_at')). \
         values('date'). \
-        annotate(metric=Sum('affiliate_fee')).\
+        annotate(metric=Sum('affiliate_fee')). \
         order_by('date')
 
     return orders_affiliate_fee
@@ -88,7 +88,7 @@ def get_ordered_for_status(begin_date: date, end_date: date, filter_by_status: s
     query_set = orders_filter[filter_by_status]. \
         annotate(date=TruncDate('created_at')). \
         values('date'). \
-        annotate(metric=Count('status')).\
+        annotate(metric=Count('status')). \
         order_by('date')
 
     return query_set
@@ -119,7 +119,7 @@ def get_db_data(begin_date: datetime, end_date: datetime) -> DBData:
     """
     db_data = DBData(
         clicks_statistic=get_clicks_statistic(begin_date, end_date),
-        ordered_for_status_in_processed=get_ordered_for_status(begin_date, end_date,'in processing'),
+        ordered_for_status_in_processed=get_ordered_for_status(begin_date, end_date, 'in processing'),
         ordered_for_status_approved=get_ordered_for_status(begin_date, end_date, 'approved'),
         ordered_for_status_canceled=get_ordered_for_status(begin_date, end_date, 'canceled'),
         orders_affiliate_fee=get_orders_affiliate_fee(begin_date, end_date)
@@ -136,13 +136,14 @@ def get_orders_statistic(begin_date: datetime, end_date: datetime):
     """
     db_data = get_db_data(begin_date, end_date)
     statistic = (OrdersStatistic(date=created_date,
-                              clicks=exclude_none(db_data.clicks_statistic.get(created_date)),
-                              orders_in_processing=exclude_none(db_data.ordered_for_status_in_processed.get(created_date)),
-                              orders_approved=exclude_none(db_data.ordered_for_status_approved.get(created_date)),
-                              orders_canceled=exclude_none(db_data.ordered_for_status_canceled.get(created_date)),
-                              orders_affiliate_fee=exclude_none(db_data.orders_affiliate_fee.get(created_date))
-                              )
-              for created_date in date_generator(begin_date, end_date))
+                                 clicks=exclude_none(db_data.clicks_statistic.get(created_date)),
+                                 orders_in_processing=exclude_none(
+                                     db_data.ordered_for_status_in_processed.get(created_date)),
+                                 orders_approved=exclude_none(db_data.ordered_for_status_approved.get(created_date)),
+                                 orders_canceled=exclude_none(db_data.ordered_for_status_canceled.get(created_date)),
+                                 orders_affiliate_fee=exclude_none(db_data.orders_affiliate_fee.get(created_date))
+                                 )
+                 for created_date in date_generator(begin_date, end_date))
 
     result = filter(lambda stat: sum([float(stat.clicks),
                                       float(stat.orders_in_processing),
