@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from datetime import date
-from typing import Any, Optional
+from datetime import date, datetime, timedelta
+from typing import Any, Optional, Generator
 
 
 def get_str_from_date(value: date) -> str:
@@ -13,12 +13,23 @@ def get_str_from_date(value: date) -> str:
     return value.strftime('%d.%m.%Y')
 
 
+def get_date_from_str(value: str) -> date:
+    """
+    Преобразует дату в строку
+    :param value:
+    :return:
+    """
+    value = datetime.strptime(value, "%d.%m.%Y")
+    return value
+
+
 def get_dict(function_to_decorate):
     """
     Получить новый словарь, ключи  - даты, значения -  показатели критерия
     :param function_to_decorate:
     :return:
     """
+
     def wrap(*args: Any, **kwargs: Any) -> dict:
         """
         Обертка словарь
@@ -44,3 +55,15 @@ def exclude_none(value: Optional[str]) -> str:
     :return:
     """
     return value if value else "0"
+
+
+def date_generator(begin_date: datetime, end_date: datetime) -> Generator:
+    """
+    Генератор дат
+    :param begin_date:
+    :param end_date:
+    :return:
+    """
+    while begin_date <= end_date:
+        yield get_str_from_date(begin_date.date())
+        begin_date = begin_date + timedelta(days=1)

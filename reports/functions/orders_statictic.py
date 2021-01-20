@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import date
-from collections import namedtuple
+from datetime import date, datetime
 
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate
@@ -10,7 +9,7 @@ from django.db.models.query import QuerySet
 
 from reports.models import Orders, Statistic
 from reports.functions.structure import OrdersStatistic
-from reports.functions.utils import get_dict, exclude_none
+from reports.functions.utils import get_dict, exclude_none, date_generator
 
 
 def get_orders_in_processing(begin_date: date, end_date: date) -> QuerySet:
@@ -60,7 +59,7 @@ def get_orders_affiliate_fee(begin_date: date, end_date: date) -> dict:
     orders_affiliate_fee = Orders.objects.filter(created_at__gte=begin_date, created_at__lte=end_date). \
         annotate(date=TruncDate('created_at')). \
         values('date'). \
-        annotate(metric=Sum('affiliate_fee')). \
+        annotate(metric=Sum('affiliate_fee')).\
         order_by('date')
 
     return orders_affiliate_fee
@@ -84,41 +83,39 @@ def get_ordered_for_status(begin_date: date, end_date: date, filter_by_status: s
     query_set = orders_filter[filter_by_status]. \
         annotate(date=TruncDate('created_at')). \
         values('date'). \
-        annotate(metric=Count('status')). \
+        annotate(metric=Count('status')).\
         order_by('date')
 
     return query_set
 
 
 @get_dict
-def get_clicks_statistic(begin_date: date, end_date: date) -> dict:
+def get_clicks_statistic(begin_date: datetime, end_date: datetime) -> dict:
     """
     Возвращает результат запроса к таблице Statistic
     :param begin_date:
     :param end_date:
     :return:
     """
+    print(begin_date)
     statistic = Statistic.objects.values('date'). \
-        filter(date__gte=begin_date.date(), date__lte=end_date.date()). \
+        filter(date__gte=begin_date, date__lte=end_date). \
         annotate(metric=Sum('clicks_uniq')). \
         order_by('date')
-
+    print(statistic.query)
     return statistic
 
 
-def get_orders_statistic(begin_date: date, end_date: date):
+def get_orders_statistic(begin_date: datetime, end_date: datetime):
     """
     Возвращает статистику доходности
     :param begin_date:
     :param end_date:
     :return:
     """
-    clicks_statistic = get_clicks_statistic(begin_date, end_date)
-    dates = list(clicks_statistic.keys())
-    dates.sort()
-
-    result = [OrdersStatistic(date=created_date,
-                              clicks=exclude_none(clicks_statistic.get(created_date)),
+    result = (OrdersStatistic(date=created_date,
+                              clicks=exclude_none(get_clicks_statistic(begin_date, end_date).get(
+                                  created_date)),
                               orders_in_processing=exclude_none(get_ordered_for_status(begin_date, end_date,
                                                                                        'in processing').get(
                                   created_date)),
@@ -129,7 +126,6 @@ def get_orders_statistic(begin_date: date, end_date: date):
                               orders_affiliate_fee=exclude_none(get_orders_affiliate_fee(begin_date, end_date).get(
                                   created_date)
                               ))
-              for created_date in dates]
-    for r in result:
-        print(r.date, r.clicks, r.orders_in_processing, r.orders_approved, r.orders_canceled, r.orders_affiliate_fee)
+              for created_date in date_generator(begin_date, end_date))
+
     return result
