@@ -13,14 +13,22 @@ def get_str_from_date(value: date) -> str:
     return value.strftime('%d.%m.%Y')
 
 
-def get_date_from_str(value: str) -> date:
+def get_date_with_min_time(value: str) -> date:
     """
     Преобразует дату в строку
     :param value:
     :return:
     """
-    value = datetime.strptime(value, "%d.%m.%Y")
-    return value
+    return datetime.combine(datetime.strptime(value, "%d.%m.%Y"), datetime.min.time())
+
+
+def get_date_with_max_time(value: str) -> date:
+    """
+    Преобразует дату в строку
+    :param value:
+    :return:
+    """
+    return datetime.combine(datetime.strptime(value, "%d.%m.%Y"), datetime.max.time())
 
 
 def get_dict(function_to_decorate):
